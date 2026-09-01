@@ -418,15 +418,23 @@
 
   function switchScreen(name) {
     currentScreen = name;
+
+    // Close any overlays first
+    var dayDetail = document.getElementById('day-detail');
+    if (dayDetail) dayDetail.style.display = 'none';
+
     document.querySelectorAll('.screen').forEach(s => {
       s.style.display = 'none';
       s.classList.remove('active');
     });
-    const target = document.getElementById('screen-' + name);
+    var target = document.getElementById('screen-' + name);
     if (target) {
       target.style.display = 'block';
       target.classList.add('active');
     }
+
+    // Scroll to top
+    window.scrollTo(0, 0);
 
     // Update bottom nav
     document.querySelectorAll('.nav-item').forEach(n => {
@@ -439,10 +447,14 @@
     });
 
     // Render screen-specific content
-    if (name === 'home') renderHome();
-    if (name === 'calendar') renderCalendar();
-    if (name === 'stats') renderStats();
-    if (name === 'settings') renderSettings();
+    try {
+      if (name === 'home') renderHome();
+      if (name === 'calendar') renderCalendar();
+      if (name === 'stats') renderStats();
+      if (name === 'settings') renderSettings();
+    } catch (e) {
+      console.warn('Screen render error:', e);
+    }
   }
 
   /* ==========================================
@@ -1256,12 +1268,12 @@
       { offset: -5, tasks: { water: true, massage: false, pillows: true, coldCompress: true, halfRice: true, potassium: false }, rice: { breakfast: 'half', lunch: 'half', dinner: 'normal' }, water: 6, notes: 'Skipped massage, was late for school. Need to wake up earlier.' },
       // 4 days ago: 3/6
       { offset: -4, tasks: { water: false, massage: false, pillows: true, coldCompress: false, halfRice: true, potassium: false }, rice: { breakfast: 'normal', lunch: 'normal', dinner: 'half' }, water: 4, notes: 'Bad day. Birthday celebration, lots of rice. Tomorrow better.' },
-      // 3 days ago: 6/6
-      { offset: -3, tasks: { water: true, massage: true, pillows: true, coldCompress: true, halfRice: true, potassium: true }, rice: { breakfast: 'none', lunch: 'half', dinner: 'half' }, water: 8, notes: 'Bounced back! Did the nanay move, asked for extra sinigang broth.' },
+      // 3 days ago: 5/6
+      { offset: -3, tasks: { water: true, massage: true, pillows: true, coldCompress: true, halfRice: true, potassium: false }, rice: { breakfast: 'none', lunch: 'half', dinner: 'half' }, water: 8, notes: 'Bounced back! Did the nanay move, asked for extra sinigang broth.' },
       // 2 days ago: 6/6
       { offset: -2, tasks: { water: true, massage: true, pillows: true, coldCompress: true, halfRice: true, potassium: true }, rice: { breakfast: 'half', lunch: 'none', dinner: 'half' }, water: 9, notes: 'Crushing it! Face less puffy in the morning. Cold water splash is legit.' },
-      // Yesterday: 6/6
-      { offset: -1, tasks: { water: true, massage: true, pillows: true, coldCompress: true, halfRice: true, potassium: true }, rice: { breakfast: 'half', lunch: 'half', dinner: 'alt' }, water: 8, notes: '3 day streak! Tinola for dinner with extra papaya. Jawline slightly visible.' }
+      // Yesterday: 5/6
+      { offset: -1, tasks: { water: true, massage: false, pillows: true, coldCompress: true, halfRice: true, potassium: true }, rice: { breakfast: 'half', lunch: 'half', dinner: 'alt' }, water: 8, notes: 'Tinola for dinner with extra papaya. Jawline slightly visible.' }
     ];
 
     sampleDays.forEach(day => {

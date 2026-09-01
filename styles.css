@@ -1553,6 +1553,12 @@ body {
 }
 
 /* --- Settings --- */
+#screen-settings {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 80px;
+}
+
 .settings-group {
   background: var(--card);
   border: 1px solid var(--border);
@@ -1700,7 +1706,7 @@ body {
   display: flex;
   justify-content: space-around;
   padding: var(--space-sm) 0;
-  z-index: 1000;
+  z-index: 9999;
   padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom));
 }
 
