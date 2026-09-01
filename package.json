@@ -1,0 +1,21 @@
+{
+  "name": "debulat-pinoy",
+  "version": "1.0.0",
+  "description": "Debloat Pinoy - Daily habit tracker for Filipino teens",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Static app - no build needed'",
+    "cap:init": "npx cap init DebloatPinoy com.debulatpinoy.app --web-dir .",
+    "cap:add": "npx cap add android",
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android",
+    "apk": "echo 'Run: npm install && npx cap add android && npx cap sync android && npx cap open android'"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.2.2"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.2.2",
+    "@capacitor/cli": "^6.2.2"
+  }
+}

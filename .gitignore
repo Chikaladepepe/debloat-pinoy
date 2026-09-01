@@ -1,0 +1,13 @@
+node_modules/
+android/
+www/
+*.ts
+server.js
+generate-icons.js
+BUILD_APK.bat
+BUILD_APK.sh
+icon-192.svg
+icon-512.svg
+package-lock.json
+.DS_Store
+.freebuff/

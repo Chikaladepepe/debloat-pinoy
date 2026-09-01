@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Debloat Pinoy - Daily habit tracker for Filipino teens to reduce facial puffiness">
+  <title>Debloat Pinoy</title>
+  <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Confirmation Dialog -->
+  <div id="confirm-dialog" class="dialog-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title" style="display:none;">
+    <div class="dialog-box">
+      <div class="dialog-icon" id="confirm-icon"></div>
+      <h3 id="confirm-title"></h3>
+      <p id="confirm-message"></p>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" id="confirm-cancel">Cancel</button>
+        <button class="btn btn-danger" id="confirm-ok">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Welcome Screen -->
+  <div id="screen-welcome" class="screen" style="display:none;">
+    <div class="welcome-container">
+      <div class="welcome-icon-wrap">
+        <i class="fa-solid fa-fire welcome-fire" aria-hidden="true"></i>
+      </div>
+      <h1 class="welcome-title">Debloat Pinoy</h1>
+      <p class="welcome-subtitle">Your daily habit tracker to reduce facial puffiness and look your best, pre!</p>
+      <div class="welcome-input-group">
+        <label for="welcome-name" class="form-label">Anong pangalan mo, pre?</label>
+        <input type="text" id="welcome-name" class="form-input" placeholder="e.g. Juan" maxlength="20" aria-required="true">
+      </div>
+      <div class="welcome-input-group">
+        <label for="welcome-age" class="form-label">Ilang taon ka na?</label>
+        <input type="number" id="welcome-age" class="form-input" placeholder="15" min="10" max="30" value="15">
+      </div>
+      <div class="welcome-input-group">
+        <label for="welcome-weight" class="form-label">Current weight (kg)?</label>
+        <input type="number" id="welcome-weight" class="form-input" placeholder="60" min="30" max="200">
+      </div>
+      <div class="welcome-input-group">
+        <label for="welcome-start-weight" class="form-label">Starting weight (kg)?</label>
+        <input type="number" id="welcome-start-weight" class="form-input" placeholder="90" min="30" max="300">
+      </div>
+      <button class="btn btn-primary btn-full" id="welcome-start" aria-label="Start tracking">
+        <i class="fa-solid fa-rocket" aria-hidden="true"></i> Let's Go, Pre!
+      </button>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" style="display:none;">
+    <!-- HOME SCREEN -->
+    <div id="screen-home" class="screen active">
+      <div class="app-header">
+        <h1 class="app-title"><i class="fa-solid fa-fire" aria-hidden="true"></i> Debloat Pinoy</h1>
+        <button class="icon-btn" id="btn-settings-home" aria-label="Settings"><i class="fa-solid fa-gear"></i></button>
+      </div>
+
+      <!-- Streak Banner -->
+      <div class="streak-banner" id="streak-banner">
+        <div class="streak-main">
+          <i class="fa-solid fa-fire streak-flame" aria-hidden="true"></i>
+          <span class="streak-number" id="streak-current">0</span>
+          <span class="streak-label">day streak</span>
+        </div>
+        <div class="streak-best">Best: <span id="streak-best">0</span> days</div>
+      </div>
+
+      <!-- Greeting + Date -->
+      <div class="greeting-section">
+        <p class="greeting-text" id="greeting-text">Good morning, pre!</p>
+        <p class="date-text" id="date-text"></p>
+      </div>
+
+      <!-- Progress Ring -->
+      <div class="progress-ring-container">
+        <svg class="progress-ring" width="140" height="140" viewBox="0 0 140 140" aria-label="Today's progress">
+          <circle class="progress-ring-bg" cx="70" cy="70" r="58" stroke-width="10" fill="none"/>
+          <circle class="progress-ring-fill" id="progress-ring-fill" cx="70" cy="70" r="58" stroke-width="10" fill="none"
+            stroke-dasharray="364.42" stroke-dashoffset="364.42" transform="rotate(-90 70 70)"/>
+          <text x="70" y="65" text-anchor="middle" class="progress-ring-text" id="progress-text">0/6</text>
+          <text x="70" y="85" text-anchor="middle" class="progress-ring-subtext">tasks done</text>
+        </svg>
+        <p class="progress-percent" id="progress-percent">0% complete</p>
+      </div>
+
+      <!-- Today's Checklist -->
+      <div class="section-header">
+        <h2>Today's Habits</h2>
+        <button class="btn btn-sm btn-ghost" id="btn-mark-all" aria-label="Mark all tasks complete">
+          <i class="fa-solid fa-check-double" aria-hidden="true"></i> All Done
+        </button>
+      </div>
+      <div class="checklist" id="checklist">
+        <!-- Task cards rendered by JS -->
+      </div>
+
+      <!-- Rice Log -->
+      <div class="section-header">
+        <h2><i class="fa-solid fa-bowl-rice" aria-hidden="true"></i> Rice Log</h2>
+      </div>
+      <div class="rice-log" id="rice-log">
+        <div class="rice-row">
+          <span class="rice-meal">Breakfast</span>
+          <div class="rice-options" data-meal="breakfast">
+            <button class="rice-btn" data-value="normal" aria-label="Normal rice">Normal</button>
+            <button class="rice-btn" data-value="half" aria-label="Half rice">Half</button>
+            <button class="rice-btn" data-value="none" aria-label="No rice">None</button>
+            <button class="rice-btn" data-value="alt" aria-label="Alternative">Alt</button>
+          </div>
+        </div>
+        <div class="rice-row">
+          <span class="rice-meal">Lunch</span>
+          <div class="rice-options" data-meal="lunch">
+            <button class="rice-btn" data-value="normal" aria-label="Normal rice">Normal</button>
+            <button class="rice-btn" data-value="half" aria-label="Half rice">Half</button>
+            <button class="rice-btn" data-value="none" aria-label="No rice">None</button>
+            <button class="rice-btn" data-value="alt" aria-label="Alternative">Alt</button>
+          </div>
+        </div>
+        <div class="rice-row">
+          <span class="rice-meal">Dinner</span>
+          <div class="rice-options" data-meal="dinner">
+            <button class="rice-btn" data-value="normal" aria-label="Normal rice">Normal</button>
+            <button class="rice-btn" data-value="half" aria-label="Half rice">Half</button>
+            <button class="rice-btn" data-value="none" aria-label="No rice">None</button>
+            <button class="rice-btn" data-value="alt" aria-label="Alternative">Alt</button>
+          </div>
+        </div>
+        <div class="rice-score" id="rice-score"></div>
+      </div>
+
+      <!-- Water Tracker -->
+      <div class="section-header">
+        <h2><i class="fa-solid fa-droplet" aria-hidden="true"></i> Water Intake</h2>
+      </div>
+      <div class="water-tracker">
+        <div class="water-glasses" id="water-glasses">
+          <!-- Rendered by JS -->
+        </div>
+        <div class="water-count">
+          <span id="water-count-text">0</span> / 8 glasses
+          <span class="water-liters" id="water-liters">(0L)</span>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="section-header">
+        <h2><i class="fa-solid fa-note-sticky" aria-hidden="true"></i> Notes</h2>
+      </div>
+      <div class="notes-section">
+        <textarea id="daily-notes" class="form-textarea" placeholder="Mood, food notes, how you feel today..." rows="3" aria-label="Daily notes"></textarea>
+        <p class="notes-timestamp" id="notes-timestamp"></p>
+      </div>
+
+      <!-- Emergency Actions -->
+      <div class="emergency-section">
+        <button class="btn btn-danger btn-full" id="btn-reset-today" aria-label="Reset today's progress">
+          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Reset Today
+        </button>
+      </div>
+    </div>
+
+    <!-- CALENDAR SCREEN -->
+    <div id="screen-calendar" class="screen" style="display:none;">
+      <div class="app-header">
+        <h1 class="app-title">Your Progress</h1>
+      </div>
+      <!-- Streak banner -->
+      <div class="streak-banner mini">
+        <div class="streak-main">
+          <i class="fa-solid fa-fire streak-flame" aria-hidden="true"></i>
+          <span class="streak-number" id="cal-streak">0</span>
+          <span class="streak-label">day streak!</span>
+        </div>
+        <div class="streak-best">Best: <span id="cal-best-streak">0</span> days</div>
+      </div>
+      <!-- Month Navigation -->
+      <div class="month-nav">
+        <button class="icon-btn" id="cal-prev" aria-label="Previous month"><i class="fa-solid fa-chevron-left"></i></button>
+        <h2 id="cal-month-label"></h2>
+        <button class="icon-btn" id="cal-next" aria-label="Next month"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+      <!-- Calendar Grid -->
+      <div class="calendar-grid">
+        <div class="cal-header"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+        <div class="cal-days" id="cal-days"></div>
+      </div>
+      <!-- Legend -->
+      <div class="cal-legend">
+        <span class="legend-item"><span class="legend-dot green"></span> 6/6 done</span>
+        <span class="legend-item"><span class="legend-dot yellow"></span> 4-5 tasks</span>
+        <span class="legend-item"><span class="legend-dot red"></span> 0-3 tasks</span>
+        <span class="legend-item"><span class="legend-dot gray"></span> No data</span>
+      </div>
+      <!-- Monthly Stats -->
+      <div class="cal-stats" id="cal-stats"></div>
+
+      <!-- Daily Detail View -->
+      <div id="day-detail" class="day-detail" style="display:none;">
+        <div class="day-detail-header">
+          <button class="icon-btn" id="day-detail-back" aria-label="Back to calendar"><i class="fa-solid fa-chevron-left"></i></button>
+          <h2 id="day-detail-date"></h2>
+        </div>
+        <div id="day-detail-content"></div>
+      </div>
+    </div>
+
+    <!-- STATS SCREEN -->
+    <div id="screen-stats" class="screen" style="display:none;">
+      <div class="app-header">
+        <h1 class="app-title">Your Stats</h1>
+      </div>
+      <!-- Summary Cards -->
+      <div class="stats-summary" id="stats-summary"></div>
+      <!-- Completion Chart -->
+      <div class="section-header">
+        <h2><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Last 30 Days</h2>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart-completion" width="400" height="200" aria-label="Completion rate bar chart"></canvas>
+      </div>
+      <!-- Rice Trend -->
+      <div class="section-header">
+        <h2><i class="fa-solid fa-bowl-rice" aria-hidden="true"></i> Rice Trend</h2>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart-rice" width="400" height="200" aria-label="Rice consumption bar chart"></canvas>
+      </div>
+      <!-- Badges -->
+      <div class="section-header">
+        <h2><i class="fa-solid fa-medal" aria-hidden="true"></i> Achievements</h2>
+      </div>
+      <div class="badges-grid" id="badges-grid"></div>
+      <!-- Weight Tracking -->
+      <div class="section-header">
+        <h2><i class="fa-solid fa-weight-scale" aria-hidden="true"></i> Weight</h2>
+      </div>
+      <div class="weight-section">
+        <div class="weight-input-row">
+          <input type="number" id="weight-input" class="form-input" placeholder="Current kg" min="30" max="200" aria-label="Enter current weight">
+          <button class="btn btn-primary" id="weight-save" aria-label="Save weight">Save</button>
+        </div>
+        <div class="weight-chart-container">
+          <canvas id="chart-weight" width="400" height="180" aria-label="Weight trend line chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- MASSAGE SCREEN -->
+    <div id="screen-massage" class="screen" style="display:none;">
+      <div class="app-header">
+        <h1 class="app-title"><i class="fa-solid fa-hand-sparkles" aria-hidden="true"></i> Care Guide</h1>
+      </div>
+      <!-- Tabs -->
+      <div class="tab-bar" role="tablist">
+        <button class="tab active" data-tab="massage-tab" role="tab" aria-selected="true"><i class="fa-solid fa-hand-sparkles"></i> Massage</button>
+        <button class="tab" data-tab="undereye-tab" role="tab" aria-selected="false"><i class="fa-solid fa-eye"></i> Under-Eye</button>
+        <button class="tab" data-tab="food-tab" role="tab" aria-selected="false"><i class="fa-solid fa-utensils"></i> Food</button>
+        <button class="tab" data-tab="nanay-tab" role="tab" aria-selected="false"><i class="fa-solid fa-user"></i> Nanay</button>
+      </div>
+
+      <!-- Massage Timer Tab -->
+      <div id="massage-tab" class="tab-content active" role="tabpanel">
+        <h2 class="tab-title">3-Minute Facial Massage</h2>
+        <p class="tab-desc">Follow along with the timer. Consistent daily massage reduces facial puffiness through lymphatic drainage.</p>
+        <!-- Timer -->
+        <div class="timer-container">
+          <div class="timer-circle" id="timer-circle">
+            <svg class="timer-svg" viewBox="0 0 200 200">
+              <circle class="timer-bg" cx="100" cy="100" r="88" fill="none" stroke-width="8"/>
+              <circle class="timer-progress" id="timer-progress" cx="100" cy="100" r="88" fill="none" stroke-width="8"
+                stroke-dasharray="553" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
+            </svg>
+            <div class="timer-display" id="timer-display">3:00</div>
+          </div>
+          <div class="timer-step-indicator" id="timer-step-indicator">Step 1 of 6</div>
+          <div class="timer-controls">
+            <button class="icon-btn timer-btn" id="timer-reset" aria-label="Reset timer"><i class="fa-solid fa-rotate-left"></i></button>
+            <button class="btn btn-primary timer-main-btn" id="timer-toggle" aria-label="Start timer">
+              <i class="fa-solid fa-play" aria-hidden="true"></i> Start
+            </button>
+            <button class="icon-btn timer-btn" id="timer-sound" aria-label="Toggle sound">
+              <i class="fa-solid fa-volume-high" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <!-- Steps -->
+        <div class="massage-steps" id="massage-steps">
+          <!-- Rendered by JS -->
+        </div>
+        <!-- Tip Box -->
+        <div class="tip-box">
+          <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
+          <p><strong>Tip:</strong> Do this every morning after washing your face. The lymphatic system is most responsive in the morning. Pair with cold water splash for maximum effect.</p>
+        </div>
+      </div>
+
+      <!-- Under-Eye Tab -->
+      <div id="undereye-tab" class="tab-content" role="tabpanel" style="display:none;">
+        <h2 class="tab-title">Under-Eye Dark Circles (Genetics Edition)</h2>
+        <div class="guide-intro-card">
+          <p>Bro, if it's genetic from your mom's side, no cream will permanently fix it. <strong>BUT</strong> you can make them look WAY less obvious. Here's what actually works.</p>
+        </div>
+        <div class="guide-section">
+          <h3><i class="fa-solid fa-snowflake" aria-hidden="true"></i> Cold Compress Methods</h3>
+          <div class="method-cards" id="undereye-methods">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+        <div class="guide-section">
+          <h3><i class="fa-solid fa-list-check" aria-hidden="true"></i> Daily Habits</h3>
+          <div class="habit-checklist" id="undereye-habits"></div>
+        </div>
+        <div class="guide-section">
+          <h3><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> What to Avoid</h3>
+          <div class="avoid-list" id="undereye-avoid"></div>
+        </div>
+        <div class="guide-section">
+          <h3><i class="fa-solid fa-palette" aria-hidden="true"></i> Quick Fix Option</h3>
+          <div class="tip-box">
+            <p><strong>Concealer:</strong> If circles bother you for events, get a peach/salmon-toned concealer from Watsons. It cancels out the dark tones. Not forever, just for special days.</p>
+          </div>
+        </div>
+        <div class="final-note">
+          <p>At 15, your face is still changing. The circles add character. Focus on the habits, be patient, and they WILL fade over time.</p>
+        </div>
+      </div>
+
+      <!-- Food Guide Tab -->
+      <div id="food-tab" class="tab-content" role="tabpanel" style="display:none;">
+        <h2 class="tab-title">Debloat Food Guide</h2>
+        <div class="food-tabs">
+          <button class="food-tab-btn active" data-food-tab="avoid" aria-label="Foods to avoid">
+            <i class="fa-solid fa-ban" aria-hidden="true"></i> Avoid
+          </button>
+          <button class="food-tab-btn" data-food-tab="eat" aria-label="Foods to eat">
+            <i class="fa-solid fa-check" aria-hidden="true"></i> Eat
+          </button>
+        </div>
+        <div id="food-avoid" class="food-content active"></div>
+        <div id="food-eat" class="food-content" style="display:none;"></div>
+      </div>
+
+      <!-- Nanay Mode Tab -->
+      <div id="nanay-tab" class="tab-content" role="tabpanel" style="display:none;">
+        <h2 class="tab-title">How to Handle Your Parents</h2>
+        <div class="guide-intro-card">
+          <p>Bro, at 15, you can't fully control meals. Here's how to debloat <strong>WITHOUT</strong> offending Nanay or Tatay.</p>
+        </div>
+        <div class="nanay-strategies" id="nanay-strategies">
+          <!-- Rendered by JS -->
+        </div>
+        <div class="final-note">
+          <p>90kg to 60kg is <strong>MASSIVE</strong>. They're proud but confused. Give them time. You're doing great, pre!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS SCREEN -->
+    <div id="screen-settings" class="screen" style="display:none;">
+      <div class="app-header">
+        <h1 class="app-title"><i class="fa-solid fa-gear" aria-hidden="true"></i> Settings</h1>
+      </div>
+      <!-- Profile -->
+      <div class="settings-group">
+        <h3 class="settings-group-title"><i class="fa-solid fa-user" aria-hidden="true"></i> Profile</h3>
+        <div class="settings-item">
+          <label for="set-name" class="settings-label">Name</label>
+          <input type="text" id="set-name" class="form-input settings-input" maxlength="20">
+        </div>
+        <div class="settings-item">
+          <label for="set-age" class="settings-label">Age</label>
+          <input type="number" id="set-age" class="form-input settings-input" min="10" max="30">
+        </div>
+        <div class="settings-item">
+          <label for="set-weight" class="settings-label">Current Weight (kg)</label>
+          <input type="number" id="set-weight" class="form-input settings-input" min="30" max="200">
+        </div>
+        <div class="settings-item">
+          <label for="set-start-weight" class="settings-label">Starting Weight (kg)</label>
+          <input type="number" id="set-start-weight" class="form-input settings-input" min="30" max="300">
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="settings-group">
+        <h3 class="settings-group-title"><i class="fa-solid fa-bell" aria-hidden="true"></i> Notifications</h3>
+        <div class="settings-toggle-item">
+          <div>
+            <span class="settings-label">Morning (7 AM)</span>
+            <span class="settings-sublabel">Massage + cold compress reminder</span>
+          </div>
+          <label class="toggle" aria-label="Toggle morning notification">
+            <input type="checkbox" id="notif-morning" class="toggle-input">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-toggle-item">
+          <div>
+            <span class="settings-label">Water (10 AM)</span>
+            <span class="settings-sublabel">Hydration check-in</span>
+          </div>
+          <label class="toggle" aria-label="Toggle water notification">
+            <input type="checkbox" id="notif-water" class="toggle-input">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-toggle-item">
+          <div>
+            <span class="settings-label">Lunch (12 PM)</span>
+            <span class="settings-sublabel">Half-rice reminder</span>
+          </div>
+          <label class="toggle" aria-label="Toggle lunch notification">
+            <input type="checkbox" id="notif-lunch" class="toggle-input">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-toggle-item">
+          <div>
+            <span class="settings-label">Merienda (3 PM)</span>
+            <span class="settings-sublabel">Healthy snack reminder</span>
+          </div>
+          <label class="toggle" aria-label="Toggle merienda notification">
+            <input type="checkbox" id="notif-merienda" class="toggle-input">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-toggle-item">
+          <div>
+            <span class="settings-label">Dinner (6 PM)</span>
+            <span class="settings-sublabel">No rice after 6 PM</span>
+          </div>
+          <label class="toggle" aria-label="Toggle dinner notification">
+            <input type="checkbox" id="notif-dinner" class="toggle-input">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-toggle-item">
+          <div>
+            <span class="settings-label">Sleep (10 PM)</span>
+            <span class="settings-sublabel">2 pillows reminder</span>
+          </div>
+          <label class="toggle" aria-label="Toggle sleep notification">
+            <input type="checkbox" id="notif-sleep" class="toggle-input">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Appearance -->
+      <div class="settings-group">
+        <h3 class="settings-group-title"><i class="fa-solid fa-palette" aria-hidden="true"></i> Appearance</h3>
+        <div class="settings-item">
+          <span class="settings-label">Dark Mode</span>
+          <span class="settings-badge">Always On</span>
+        </div>
+        <div class="settings-item">
+          <label for="set-font-size" class="settings-label">Font Size</label>
+          <select id="set-font-size" class="form-select settings-input">
+            <option value="small">Small</option>
+            <option value="medium" selected>Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Data -->
+      <div class="settings-group">
+        <h3 class="settings-group-title"><i class="fa-solid fa-database" aria-hidden="true"></i> Data</h3>
+        <button class="btn btn-ghost btn-full settings-action" id="btn-export-data" aria-label="Export all data">
+          <i class="fa-solid fa-download" aria-hidden="true"></i> Export Data (JSON)
+        </button>
+        <button class="btn btn-danger btn-full settings-action" id="btn-clear-data" aria-label="Clear all data">
+          <i class="fa-solid fa-trash" aria-hidden="true"></i> Clear All Data
+        </button>
+      </div>
+
+      <!-- About -->
+      <div class="settings-group about">
+        <p class="about-text">Debloat Pinoy v1.0.0</p>
+        <p class="about-text">Made with <i class="fa-solid fa-heart" style="color: var(--danger);" aria-hidden="true"></i> for Filipino teens</p>
+        <p class="about-text muted">All data stored locally. No servers. No tracking.</p>
+      </div>
+    </div>
+
+    <!-- Skip Day Dialog (inside app) -->
+    <div id="skip-day-dialog" class="dialog-overlay" style="display:none;" role="dialog" aria-modal="true">
+      <div class="dialog-box">
+        <div class="dialog-icon"><i class="fa-solid fa-calendar-xmark" aria-hidden="true"></i></div>
+        <h3>Skip Today?</h3>
+        <p>Mark today as a rest day. Streak will reset but that's okay, pre!</p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" id="skip-cancel">Cancel</button>
+          <button class="btn btn-secondary" id="skip-confirm">Skip Day</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav" id="bottom-nav" role="navigation" aria-label="Main navigation">
+      <button class="nav-item active" data-screen="home" aria-label="Home" aria-current="page">
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" data-screen="calendar" aria-label="Calendar">
+        <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+        <span>Calendar</span>
+      </button>
+      <button class="nav-item" data-screen="massage" aria-label="Care Guide">
+        <i class="fa-solid fa-hand-sparkles" aria-hidden="true"></i>
+        <span>Care</span>
+      </button>
+      <button class="nav-item" data-screen="stats" aria-label="Stats">
+        <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+        <span>Stats</span>
+      </button>
+      <button class="nav-item" data-screen="settings" aria-label="Settings">
+        <i class="fa-solid fa-gear" aria-hidden="true"></i>
+        <span>Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Register Service Worker for offline PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('SW registered:', reg.scope))
+          .catch((err) => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
