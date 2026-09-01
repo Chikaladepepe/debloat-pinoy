@@ -1548,6 +1548,15 @@
       document.getElementById('screen-welcome').style.display = 'none';
       document.getElementById('app').style.display = 'block';
 
+      // Bind all events (same as returning user path)
+      bindEvents();
+      renderMassageSteps();
+      renderUnderEyeGuide();
+      renderFoodGuide();
+      renderNanayMode();
+      updateTimerDisplay();
+      initCalendar();
+
       showToast(`Welcome, ${name}! Let's start debloating!`, 'success');
       switchScreen('home');
     });
