@@ -1270,8 +1270,8 @@
       { offset: -4, tasks: { water: false, massage: false, pillows: true, coldCompress: false, halfRice: true, potassium: false }, rice: { breakfast: 'normal', lunch: 'normal', dinner: 'half' }, water: 4, notes: 'Bad day. Birthday celebration, lots of rice. Tomorrow better.' },
       // 3 days ago: 5/6
       { offset: -3, tasks: { water: true, massage: true, pillows: true, coldCompress: true, halfRice: true, potassium: false }, rice: { breakfast: 'none', lunch: 'half', dinner: 'half' }, water: 8, notes: 'Bounced back! Did the nanay move, asked for extra sinigang broth.' },
-      // 2 days ago: 6/6
-      { offset: -2, tasks: { water: true, massage: true, pillows: true, coldCompress: true, halfRice: true, potassium: true }, rice: { breakfast: 'half', lunch: 'none', dinner: 'half' }, water: 9, notes: 'Crushing it! Face less puffy in the morning. Cold water splash is legit.' },
+      // 2 days ago: 5/6
+      { offset: -2, tasks: { water: true, massage: true, pillows: true, coldCompress: true, halfRice: true, potassium: false }, rice: { breakfast: 'half', lunch: 'none', dinner: 'half' }, water: 9, notes: 'Crushing it! Face less puffy in the morning. Cold water splash is legit.' },
       // Yesterday: 5/6
       { offset: -1, tasks: { water: true, massage: false, pillows: true, coldCompress: true, halfRice: true, potassium: true }, rice: { breakfast: 'half', lunch: 'half', dinner: 'alt' }, water: 8, notes: 'Tinola for dinner with extra papaya. Jawline slightly visible.' }
     ];
