@@ -3,7 +3,7 @@
    Caches all app shell assets for offline use
    ============================================ */
 
-const CACHE_NAME = 'debulat-pinoy-v1';
+const CACHE_NAME = 'debulat-pinoy-v3';
 const ASSETS = [
   './',
   './index.html',
